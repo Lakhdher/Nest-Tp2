@@ -1,11 +1,11 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Post, Get, Body, Delete, Patch, Param, Version, Query, ParseIntPipe} from '@nestjs/common';
+import { Controller, Post, Get, Body, Delete, Patch, Param, Version, Query, ParseIntPipe, Req} from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { Todo } from './entities/todo';
 import { AddTodoDto } from './dto/addtodo.dto';
 import { UpdateTodoDto } from './dto/updatetodo.dto';
 import { SearchTodoDto } from './dto/searchtodo.dto';
-
+import { UserRole } from '../common/user-role.enum';
 @Controller('todo')
 export class TodoController {
     private todos = [];
@@ -24,8 +24,16 @@ export class TodoController {
 
     // get all todo with typeorm
     @Get('/all')
-    async getAllTodosV2(){
-        return await this.todoService.getAllTodosV2();
+    async getAllTodosV2(
+        @Req() req,
+    ){
+        const user = req['user'];
+        if(user.role === UserRole.ADMIN)
+        {
+            return await this.todoService.getAllTodosV2();
+        }else{
+            return await this.todoService.getAllTodosByUserId(user.id);
+        }
     }
 
     @Get('/all/paginated')
@@ -47,8 +55,9 @@ export class TodoController {
     @Post()
     async addTodoV2(
         @Body() newTodo: AddTodoDto,
+        @Req() req,
     ){
-        return await this.todoService.addTodoV2(newTodo);
+        return await this.todoService.addTodoV2(newTodo, req['user'].id);
     }
 
     // @Get(':id')
@@ -72,8 +81,9 @@ export class TodoController {
     @Delete('/:id')
     async softDeleteTodo(
         @Param('id') id : string,
+        @Req() req,
     ) {
-        return await this.todoService.softDeleteTodoById(+id);
+        return await this.todoService.softDeleteTodoById(+id, req['user'].id);
     }
 
     @Get('restore/:id')
@@ -96,9 +106,10 @@ export class TodoController {
     @Patch('/:id')
     async updateTodoByIDV2(
         @Param('id') id : string,
-        @Body() newTodo: UpdateTodoDto
+        @Body() newTodo: UpdateTodoDto,
+        @Req() req
         ) {
-            return await this.todoService.updateTodoByIdV2(+id, newTodo);
+            return await this.todoService.updateTodoByIdV2(+id, newTodo, req['user'].id);
     }
 
     // @Get('/countall')

@@ -1,4 +1,4 @@
-import { Time } from "src/common/time";
+import { Time } from '../../common/time';
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { TodoStatusEnum } from "../todo-status.enum";
 
@@ -12,4 +12,6 @@ export class TodoEntity extends Time {
     description: string;
     @Column({ type: 'enum', enum: TodoStatusEnum, default: TodoStatusEnum.waiting})
     status: TodoStatusEnum;
+    @Column()
+    userId: number;
 }

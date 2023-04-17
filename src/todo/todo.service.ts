@@ -82,11 +82,20 @@ export class TodoService {
     return todo;
   }
 
-  async addTodoV2(newTodo: AddTodoDto){
-    return await this.todoRepository.save(newTodo);
+  async addTodoV2(newTodo: AddTodoDto, userId: number){
+    const todo = this.todoRepository.create({
+      ...newTodo,
+      userId
+    });
+    return await this.todoRepository.save(todo);
   }
 
-  async softDeleteTodoById(id: number){
+  async softDeleteTodoById(id: number, userId: number){
+    const todo = await this.todoRepository.findOne({where : {"id" : id}});
+    if(!todo) throw new NotFoundException(`todo of id ${id} not found`);
+    if(todo.userId !== userId){
+      throw new NotFoundException(`le todo d'id ${id} n'appartient pas à l'utilisateur ${userId}`)
+    }
     return await this.todoRepository.softDelete(id);
   }
 
@@ -94,7 +103,7 @@ export class TodoService {
     return await this.todoRepository.restore(id);
   }  
 
-  async updateTodoByIdV2(id:number,todo: UpdateTodoDto){
+  async updateTodoByIdV2(id:number, todo: UpdateTodoDto, userId: number){
     const newTodo=await this.todoRepository.preload({
       id,
       ...todo
@@ -102,7 +111,11 @@ export class TodoService {
     if(!newTodo){
       throw new NotFoundException(`le todo d'id {$id} n'existe pas`)
     }
-    await this.todoRepository.save(newTodo)
+    if(newTodo.userId !== userId){
+      throw new NotFoundException(`le todo d'id ${id} n'appartient pas à l'utilisateur ${userId}`)
+    }else{
+      return await this.todoRepository.save(newTodo);
+    }
   }
 
   async countTodoByStatus(status: any){
@@ -127,7 +140,7 @@ export class TodoService {
   //   return this.todoRepository.find() ;
   // }
 
-async searchTodo(param: SearchTodoDto){
+  async searchTodo(param: SearchTodoDto){
   const {status, criteria} = param;
   if(!status && !criteria) {
     return await this.todoRepository.find();
@@ -140,5 +153,12 @@ async searchTodo(param: SearchTodoDto){
       where : [{name: NameQuery , status: StatusQuery}
       ,{description: descriptionQuery, status:StatusQuery}]
     })
-  }}
+    }
+  }
+
+  async getAllTodosByUserId(userId: number){
+    return await this.todoRepository.find({where : {userId : userId}});
+  }
+
+
 }

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MaxLength, MinLength,  } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, MaxLength, MinLength,  } from "class-validator";
 
 export class AddTodoDto {
   
@@ -18,5 +18,4 @@ export class AddTodoDto {
       message: "Description is too short...minimum length is 10"
   })
   description: string;
-
 }
