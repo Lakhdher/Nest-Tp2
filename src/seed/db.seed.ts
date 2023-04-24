@@ -27,8 +27,8 @@ async function bootstrap() {
     for (let j = 0;j<12;j++){
         const skill = new SkillEntity()
         skill.designation=randSkill()
-        await skillService.create(skill)
-        skills.push(skill)
+        const newSkill = await skillService.create(skill)
+        skills.push(newSkill)
     }
 
     for (let i = 0; i < 10; i++) {
@@ -49,8 +49,8 @@ async function bootstrap() {
             skills[i+1],
             skills[i+2]
         ]
-        await userService.register(user);
-        await cvService.createUsingCv(cv,user)
+        const newUser = await userService.register(user);
+        await cvService.createUsingCv(cv,newUser)
     }
     await app.close();
 }

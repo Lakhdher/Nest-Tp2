@@ -34,7 +34,10 @@ export class CvEntity {
 
     @ManyToMany(
         ()=>SkillEntity,
-        (skill)=>skill.cvs
+        (skill)=>skill.cvs,
+        // {
+        //     cascade : true
+        // }
     )
     @JoinTable()
     skills : SkillEntity[]

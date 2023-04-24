@@ -13,7 +13,7 @@ export class SkillEntity {
 
     @ManyToMany(
         ()=>CvEntity,
-        (cv)=>cv.skills
+        (cv)=>cv.skills,
     )
     cvs : CvEntity[]
 

@@ -16,7 +16,7 @@ export class UserService {
         private jwtService : JwtService
     ) {}
 
-    async register(userData : userSubscribeDto): Promise<Partial<UserEntity>> {
+    async register(userData : userSubscribeDto): Promise<UserEntity> {
         const user = this.userRepository.create({...userData});
         user.salt = await bcrypt.genSalt();
         user.password = await bcrypt.hash(userData.password, user.salt);
@@ -26,7 +26,8 @@ export class UserService {
         catch (error) {
             throw new ConflictException('Username or email already exists');
         }
-        return{id: user.id, username: user.username, email: user.email, role: user.role};
+        // return{id: user.id, username: user.username, email: user.email, role: user.role};
+        return(user);
     }
 
     async login(credentials : loginCredentialsDto) {
