@@ -117,10 +117,10 @@ export class TodoController {
     //     return await this.todoService.countTodo();
     // }
 
-    @Get('/count/:status')
+    @Get('/count/status')
     async countTodoByStatus(
-        @Param('status') status : string,
+        @Req() req,
     ){
-        return await this.todoService.countTodoByStatus(status);
+        return await this.todoService.countTodoByStatus(req['user']);
     }
 }

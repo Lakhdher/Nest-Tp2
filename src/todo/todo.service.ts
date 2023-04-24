@@ -9,6 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { SearchTodoDto } from './dto/searchtodo.dto';
 import { stat } from 'fs';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { UserRole } from 'src/common/user-role.enum';
 
 @Injectable()
 export class TodoService {
@@ -118,9 +120,15 @@ export class TodoService {
     }
   }
 
-  async countTodoByStatus(status: any){
-    return await this.todoRepository.count({where : {status : status}});
-  }
+  async countTodoByStatus(user : UserEntity){
+         if(user.role === UserRole.ADMIN){
+      const actif = await this.todoRepository.count({where : {status : TodoStatusEnum.actif}});
+      const waiting = await this.todoRepository.count({where : {status : TodoStatusEnum.waiting}});
+      const done = await this.todoRepository.count({where : {status : TodoStatusEnum.done}});
+      return {"actif": actif,"waiting": waiting,"done": done};
+         }
+    }
+  
 
   async countTodo() {
     const counts = {} ;
